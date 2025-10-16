@@ -1,0 +1,54 @@
+plugins {
+    id 'java'
+    id 'io.qameta.allure' version '2.11.2'
+}
+
+group = 'ru.SimbirSoft'
+version = '1.0-SNAPSHOT'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+}
+
+repositories {
+    mavenCentral()
+    google()
+    gradlePluginPortal()
+}
+
+dependencies {
+    implementation 'org.seleniumhq.selenium:selenium-java:4.17.0'
+    implementation 'com.github.javafaker:javafaker:1.0.2'
+
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+    testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+
+    // Allure зависимости
+    testImplementation 'io.qameta.allure:allure-junit5:2.24.0'
+    // https://mvnrepository.com/artifact/io.qameta.allure/allure-junit5
+    testImplementation("io.qameta.allure:allure-junit5:2.24.0")
+    // Указываем кастомную директорию для результатов Allure
+    resultsDir = file('ru.SimbirSoft.allure-results')
+}
+
+test {
+    // Устанавливаем системное свойство для пути к allure результатам
+    systemProperty 'allure.results.directory', 'ru.SimbirSoft.allure-results'
+    useJUnitPlatform()
+    testLogging {
+        events "passed", "skipped", "failed"
+        showStandardStreams = true
+        exceptionFormat = "full"
+    }
+    systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
+}
+
+allure {
+    version = '2.24.0'
+    autoconfigure = true
+    useJUnit5 {
+        version = '2.24.0'
+    }
+}
