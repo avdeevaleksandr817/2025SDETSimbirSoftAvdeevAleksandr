@@ -1,10 +1,11 @@
+// Настройки управления плагинами
 pluginManagement {
     repositories {
-        mavenCentral()
-        google()
-        gradlePluginPortal()
+        gradlePluginPortal() // Репозиторий плагинов Gradle
+        mavenCentral() // Основной Maven репозиторий
     }
 }
 
+// Имя корневого проекта
 rootProject.name = '2025SDETSimbirSoftAvdeevAleksandr'
 

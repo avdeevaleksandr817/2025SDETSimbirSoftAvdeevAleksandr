@@ -1,89 +1,90 @@
 package ru.SimbirSoft.Test;
 
 import io.qameta.allure.*;
-import io.qameta.allure.Description;
-import io.qameta.allure.Epic;
-import io.qameta.allure.Feature;
-import io.qameta.allure.Story;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.api.extension.RegisterExtension;
 import ru.SimbirSoft.Driver.BrowserManager;
 import ru.SimbirSoft.Pages.FormFieldsPage;
 import ru.SimbirSoft.config.AppConfig;
-import ru.SimbirSoft.listeners.AllureTestListener;
-import ru.SimbirSoft.listeners.AllureUtils;
-import ru.SimbirSoft.listeners.ScreenshotListener;
 
-@ExtendWith(ScreenshotListener.class)
-@Epic("UI Automation")
-@Feature("Form Fields")
-@ExtendWith(AllureTestListener.class)
-public class FormFieldsTests {
-
-    private BrowserManager browserManager;
-    private FormFieldsPage formFieldsPage;
-
-    // Регистрируем слушатель с передачей browserManager
-    @RegisterExtension
-    ScreenshotListener screenshotListener = new ScreenshotListener(browserManager);
-
-    @BeforeEach
-    void setUp() {
-        browserManager = new BrowserManager();
-        formFieldsPage = new FormFieldsPage(browserManager);
-        browserManager.openUrl(AppConfig.BASE_URL);
-        browserManager.waitForPageLoad();
-
-        // Обновляем ссылку на browserManager в слушателе
-        screenshotListener = new ScreenshotListener(browserManager);
-    }
-
-    @AfterEach
-    void tearDown() {
-        if (browserManager != null) {
-            browserManager.quitDriver();
-        }
-    }
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Тестовый класс для проверки функциональности формы
+ * Использует JUnit 5 и Allure для отчетности
  */
-    @Test
-    @Story("Successful Form Submission")
-    @DisplayName("Успешная отправка формы с валидными данными")
-    @Description("Тест проверяет успешную отправку формы со всеми заполненными полями")
-    @Severity(SeverityLevel.CRITICAL)
-    void testSuccessfulFormSubmission() {
-        // Генерация тестовых данных
-        String name = formFieldsPage.generateRandomName();
-        String password = formFieldsPage.generateRandomPassword();
-        String email = formFieldsPage.generateEmail(name);
-        String message = formFieldsPage.getAutomationToolsMessage();
+@Epic("UI Automation") // Allure эпик - основная функциональная область
+@Feature("Form Fields") // Allure фича - конкретная функциональность
 
-        AllureUtils.addParameter("Имя", name);
-        AllureUtils.addParameter("Email", email);
-        AllureUtils.addParameter("Сообщение", message);
+public class FormFieldsTests {
 
-        // Заполняем форму
-        formFieldsPage
-                .enterName(name)
-                .enterPassword(password)
-                .selectMilkAndCoffee()
-                .selectYellowColor()
-                .selectAutomationOption("Yes")
-                .enterEmail(email)
-                .enterMessage(message)
-                .submitForm();
+    private BrowserManager browserManager; // Менеджер браузера для управления WebDriver
+    private FormFieldsPage formFieldsPage; // Page Object для взаимодействия с формой
 
-        AllureUtils.addScreenshot(browserManager.getDriver(), "Форма заполнена и отправлена");
+    /**
+     * Метод выполняется ПЕРЕД КАЖДЫМ тестом
+     * Инициализирует браузер и открывает тестовую страницу
+     */
+    @BeforeEach
+    void setUp() {
+        browserManager = new BrowserManager(); // Создаем новый менеджер браузера
+        formFieldsPage = new FormFieldsPage(browserManager); // Создаем Page Object для формы
+        browserManager.openUrl(AppConfig.BASE_URL); // Открываем тестовую страницу
+        browserManager.waitForPageLoad(); // Ожидаем полной загрузки страницы
 
-        // Обрабатываем alert
-        formFieldsPage.handleAlert("Message received!");
-
-        AllureUtils.addStep("Форма успешно отправлена и alert обработан");
     }
+
+    /**
+     * Метод выполняется ПОСЛЕ КАЖДОГО теста
+     * Закрывает браузер и освобождает ресурсы
+     */
+    @AfterEach
+    void tearDown() {
+        if (browserManager != null) {
+            browserManager.quitDriver(); // Закрываем браузер и освобождаем ресурсы
+        }
+    }
+
+    /**
+     * ОСНОВНОЙ ПОЗИТИВНЫЙ ТЕСТ
+     * Проверяет успешное заполнение и отправку формы со всеми валидными данными
+     */
+    @Test
+    @Story("Successful Form Submission") // Allure история - конкретный сценарий
+    @DisplayName("Успешная отправка формы с валидными данными") // Отображаемое имя теста
+    @Description("Тест проверяет успешную отправку формы со всеми заполненными полями") // Описание теста
+
+    @Severity(SeverityLevel.CRITICAL) // Важность теста - критический
+
+        void testSuccessfulFormSubmission() {
+
+        // Генерация тестовых данных
+        String name = formFieldsPage.generateRandomName(); // Генерируем случайное имя
+        String password = formFieldsPage.generateRandomPassword(); // Генерируем случайный пароль
+        String email = formFieldsPage.generateEmail(name); // Генерируем email на основе имени
+        String message = formFieldsPage.getAutomationToolsMessage(); // Создаем сообщение об инструментах
+
+        // Заполнение формы с использованием Fluent Interface
+        formFieldsPage
+
+                .enterName(name) // 1. Заполнить поле Name
+                .enterPassword(password) // 2. Заполнить поле Password
+                .selectMilkAndCoffee() // 3. Выбрать Milk и Coffee
+                .selectYellowColor() // 4. Выбрать Yellow цвет
+                .selectAutomationOption("Yes") // 5. Выбрать опцию автоматизации
+                .enterEmail(email) // 6. Заполнить Email
+                .enterMessage(message) // 7. Ввести сообщение
+                .submitForm(); // 8. Нажать Submit
+
+        assertTrue(formFieldsPage.isSuccessMessageDisplayed(),
+                "Success alert should be displayed after form submission");
+
+        String actualMessage = formFieldsPage.getSuccessMessage();
+        assertEquals("Message received!", actualMessage,
+                "Success message text should be 'Message received!'");
+
+    }
+
 }

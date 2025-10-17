@@ -19,16 +19,12 @@ public class BrowserManager {
 
     /**
      * Конструктор инициализирует драйвер и настраивает браузер
-     * Выполняется при создании экземпляра BrowserManager
      */
     public BrowserManager() {
         // Создаем ChromeDriver с настройками из ChromeOptionsConfig
         this.driver = WebDriverFactory.createChromeDriver(ChromeOptionsConfig.getChromeOptions());
-
-        // Настраиваем браузер после создания
-        maximizeWindow();     // Максимизируем окно браузера
+        maximizeWindow(); // Максимизируем окно браузера
         setImplicitWait(AppConfig.IMPLICIT_WAIT); // Устанавливаем неявное ожидание
-
     }
 
     /**
@@ -77,7 +73,6 @@ public class BrowserManager {
         if (driver != null) {
             // Создаем явное ожидание с увеличенным таймаутом
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(AppConfig.PAGE_LOAD_WAIT));
-
             // Ожидаем, пока документ не перейдет в состояние "complete"
             wait.until((ExpectedCondition<Boolean>) wd ->
                     ((JavascriptExecutor) wd).executeScript("return document.readyState").equals("complete"));
@@ -90,9 +85,8 @@ public class BrowserManager {
      */
     public void quitDriver() {
         if (driver != null) {
-            driver.quit();    // Полное закрытие браузера и процесса
-            driver = null;    // Обнуляем ссылку для сборки мусора
+            driver.quit(); // Полное закрытие браузера и процесса
+            driver = null; // Обнуляем ссылку для сборки мусора
         }
     }
-
 }

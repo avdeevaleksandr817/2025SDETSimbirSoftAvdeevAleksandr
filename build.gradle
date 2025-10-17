@@ -13,8 +13,6 @@ java {
 
 repositories {
     mavenCentral()
-    google()
-    gradlePluginPortal()
 }
 
 dependencies {
@@ -25,24 +23,22 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-    // Allure зависимости
+    // Для устранения предупреждений SLF4J
+    testImplementation 'org.slf4j:slf4j-simple:2.0.9'
+
+    // Allure с совместимыми версиями
     testImplementation 'io.qameta.allure:allure-junit5:2.24.0'
-    // https://mvnrepository.com/artifact/io.qameta.allure/allure-junit5
-    testImplementation("io.qameta.allure:allure-junit5:2.24.0")
-    // Указываем кастомную директорию для результатов Allure
-    resultsDir = file('ru.SimbirSoft.allure-results')
+    testImplementation 'io.qameta.allure:allure-attachments:2.24.0'
 }
 
 test {
-    // Устанавливаем системное свойство для пути к allure результатам
-    systemProperty 'allure.results.directory', 'ru.SimbirSoft.allure-results'
     useJUnitPlatform()
+    systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
     testLogging {
         events "passed", "skipped", "failed"
         showStandardStreams = true
         exceptionFormat = "full"
     }
-    systemProperty 'junit.jupiter.extensions.autodetection.enabled', 'true'
 }
 
 allure {
@@ -50,5 +46,16 @@ allure {
     autoconfigure = true
     useJUnit5 {
         version = '2.24.0'
+    }
+    // Создаем задачу которая всегда генерирует отчет
+    task generateAllureReport(type: Exec) {
+        dependsOn 'test'
+        commandLine 'allure', 'generate', 'build/allure-results', '-o', 'build/reports/allure-report', '--clean'
+        ignoreExitValue = true // Игнорируем код возврата
+    }
+
+    task openAllureReport(type: Exec) {
+        dependsOn 'generateAllureReport'
+        commandLine 'allure', 'open', 'build/reports/allure-report'
     }
 }

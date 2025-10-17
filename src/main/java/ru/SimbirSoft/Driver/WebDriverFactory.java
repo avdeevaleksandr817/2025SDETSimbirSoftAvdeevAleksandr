@@ -6,7 +6,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 
 /**
  * Фабрика для создания экземпляров WebDriver
- * Реализует паттерн Factory Method для инкапсуляции логики создания драйвера
+ * Реализует паттерн Factory Method
  */
 public class WebDriverFactory {
 
@@ -16,15 +16,8 @@ public class WebDriverFactory {
      * @return экземпляр WebDriver для управления браузером
      */
     public static WebDriver createChromeDriver(ChromeOptions options) {
-        // Логирование начала создания драйвера
-        System.out.println("Creating ChromeDriver instance with configured options...");
 
         // Создаем новый экземпляр ChromeDriver с переданными опциями
-        WebDriver driver = new ChromeDriver(options);
-
-        // Логирование успешного создания
-        System.out.println("ChromeDriver successfully created");
-
-        return driver; // Возвращаем созданный драйвер
+        return new ChromeDriver(options);
     }
 }
